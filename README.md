@@ -1,94 +1,71 @@
-🏥 Sistema de Gestión Hospitalaria (HIS)
-¡Bienvenido! Este proyecto es la interfaz frontend (HTML/JS) para un sistema de gestión hospitalaria desarrollado con Spring Boot en el backend. Permite el control total (CRUD) de las entidades clave del hospital.
+# 🏥 Sistema de Gestión Hospitalaria (HIS)
 
-⚙️ Tecnologías Utilizadas
-Tecnología
+¡Bienvenido!  
+Este proyecto corresponde a la **interfaz frontend (HTML/JS)** del Sistema de Gestión Hospitalaria desarrollado con **Spring Boot** en el backend.  
+Permite la administración completa (CRUD) de las entidades clave del hospital: médicos, pacientes, citas, historias clínicas y reportes.
 
-Descripción
+---
 
-Java / Spring Boot
+## ⚙️ Tecnologías Utilizadas
 
-☕ Backend principal, servicios REST y conexión a la base de datos.
+| Tecnología | Descripción |
+|-------------|-------------|
+| ☕ **Java / Spring Boot** | Backend principal, servicios REST y conexión con la base de datos. |
+| 🌐 **HTML5 / CSS3** | Estructura y estilos base de la interfaz de usuario. |
+| ✨ **JavaScript (Vanilla)** | Lógica de frontend, manejo de eventos y comunicación asíncrona (Fetch API). |
+| 🔗 **APIs REST** | Intercambio de datos estándar entre frontend y backend usando JSON. |
 
-HTML5 / CSS3
+---
 
-🌐 Estructura y estilos base de la interfaz.
+## 🚀 Módulos Implementados (CRUD)
 
-JavaScript (Vainilla)
+| Módulo | Endpoint Principal | Estado | Observaciones |
+|---------|--------------------|---------|----------------|
+| 🧑‍⚕️ **Médicos** | `/api/medicos` | ✅ Listo | Gestión de especialidades y datos de contacto. |
+| 🧍 **Pacientes** | `/api/pacientes` | ✅ Listo | Gestión de datos demográficos y contacto. |
+| 📖 **Historias Clínicas** | `/api/historias-clinicas` | ✅ Listo | Gestión de la información médica con edición vía modal. |
+| 📋 **Reportes** | `/api/reportes/...` | 📊 Listo | Generación dinámica de reportes (médicos, citas, pacientes, historias). |
+| 📅 **Citas** | `/api/citas` | 🚧 En desarrollo | Próximo módulo clave para conectar Médicos y Pacientes. |
 
-✨ Lógica de frontend, manejo de eventos y comunicación asíncrona (Fetch API) con el backend.
+---
 
-APIs REST
+## 🛠️ Instrucciones de Configuración y Ejecución
 
-🔗 Comunicación estándar entre el frontend y el backend (JSON).
+### 🔹 Backend (Spring Boot)
+1. Asegúrate de que el proyecto de **Spring Boot** esté corriendo correctamente.  
+2. Verifica que los endpoints (`/api/medicos`, `/api/pacientes`, `/api/historias-clinicas`, etc.) estén disponibles.  
+3. La base de datos debe estar configurada y accesible desde `application.properties` o `application.yml`.
 
-🚀 Módulos Implementados (CRUD)
-Hemos desarrollado y optimizado los siguientes módulos con funcionalidad completa de Crear, Leer, Actualizar y Desactivar (CRUD):
+### 🔹 Frontend (HTML / JS)
+1. Coloca los archivos HTML (`medicos.html`, `pacientes.html`, `historias.html`, `reportes.html`, etc.) dentro de la carpeta:
+src/main/resources/static
 
-Módulo
+markdown
+Copiar código
+2. Asegúrate de incluir tu hoja de estilos (`css/styles.css`) y los scripts JS necesarios.
+3. Inicia el proyecto Spring Boot y abre el navegador en:
+http://localhost:8080/index.html
 
-Endpoint Principal
+yaml
+Copiar código
 
-Estatus
+---
 
-Observaciones Clave
+## 💡 Notas de Desarrollo Importantes
 
-🧑‍⚕️ Médicos
+- 🚫 **Sin `alert()` ni `confirm()`**:  
+Las confirmaciones y mensajes del usuario se manejan mediante **modales** y un sistema visual de notificaciones (`#notification`).
 
-/api/medicos
+- 🔍 **Diagnóstico rápido**:  
+Si la tabla no carga datos, abre la consola del navegador (`F12`) y revisa los logs de las funciones `cargar*()`.  
+Es posible que el backend esté devolviendo propiedades con nombres distintos a los esperados.
 
-✅ Listo
+- 🧱 **Arquitectura modular**:  
+Cada entidad cuenta con su propio HTML y script JS, comunicándose directamente con su endpoint REST correspondiente.
 
-Gestión de especialidades y datos de contacto.
+---
 
-🧍 Pacientes
-
-/api/pacientes
-
-✅ Listo
-
-Gestión de datos demográficos y contacto.
-
-📖 Historias Clínicas
-
-/api/historias-clinicas
-
-✅ Listo
-
-Gestión de la información médica con sistema de edición vía modal.
-
-📋 Reportes
-
-/api/reportes/...
-
-📊 Listo
-
-Generación dinámica de tablas y descarga de datos.
-
-📅 Citas
-
-(Pendiente)
-
-🚧 En Desarrollo
-
-Próximo módulo clave para conectar Médicos y Pacientes.
-
-🛠️ Instrucciones de Configuración y Ejecución
-Backend (Spring Boot):
-
-Asegúrate de que tu proyecto Spring Boot esté ejecutándose.
-
-Verifica que los puertos y los endpoints (/api/medicos, /api/pacientes, etc.) estén disponibles.
-
-Frontend (HTML):
-
-Los archivos HTML (como medicos.html, pacientes.html, historias.html, reportes.html) deben estar ubicados en la carpeta src/main/resources/static de tu proyecto Spring Boot para que se sirvan correctamente.
-
-Acceso:
-
-Navega a la URL base del frontend, generalmente http://localhost:8080/index.html (o el nombre de tu archivo principal).
-
-💡 Notas de Desarrollo Importantes
-Sin alert() ni confirm(): Toda la interacción crítica con el usuario (edición y eliminación) se maneja mediante modales y el sistema de notificaciones (#notification).
-
-Diagnóstico: Si la tabla no carga, abre la consola (F12) y verifica el console.log en las funciones cargar*() para asegurar que el backend esté devolviendo el JSON con los nombres de propiedades correctos.
+## 👨‍💻 Autor
+Proyecto desarrollado por **Fabrizio Jiménez**  
+Estudiante de **Diseño y Desarrollo de Software – TECSUP**  
+📅 Año académico 2025
