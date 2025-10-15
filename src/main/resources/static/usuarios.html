@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Usuarios</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        main {
+            max-width: 1100px;
+            margin: 3rem auto;
+            background: #fff;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #0a4d68;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            background-color: #0a4d68;
+            color: white;
+            padding: 0.6rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #107dac;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        th, td {
+            padding: 0.9rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: #0a4d68;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f7fa;
+        }
+
+        tr:hover {
+            background-color: #eaf5fb;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: #000;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+        }
+
+        .btn-edit:hover {
+            background-color: #e0a800;
+        }
+
+        .btn-delete:hover {
+            background-color: #c82333;
+        }
+
+        .back {
+            display: inline-block;
+            margin-top: 1.5rem;
+            text-decoration: none;
+            color: #0a4d68;
+            font-weight: bold;
+        }
+
+        .back:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Gestión de Usuarios</h1>
+
+    <div class="actions">
+        <button class="btn" onclick="abrirFormulario()">➕ Nuevo Usuario</button>
+    </div>
+
+    <table>
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Rol</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody id="tablaUsuarios">
+        <tr>
+            <td>1</td>
+            <td>admin</td>
+            <td>ADMIN</td>
+            <td>Activo</td>
+            <td>
+                <button class="btn btn-edit">Editar</button>
+                <button class="btn btn-delete">Eliminar</button>
+            </td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>asistente1</td>
+            <td>ASISTENTE</td>
+            <td>Activo</td>
+            <td>
+                <button class="btn btn-edit">Editar</button>
+                <button class="btn btn-delete">Eliminar</button>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a href="/" class="back">← Volver al inicio</a>
+</main>
+
+<script>
+    function abrirFormulario() {
+        alert("Aquí se abriría un formulario modal para registrar un nuevo usuario (puedes implementarlo luego).");
+    }
+</script>
+</body>
+</html>

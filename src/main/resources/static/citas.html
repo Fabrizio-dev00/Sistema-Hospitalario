@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Citas</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header>
+    <h2>Gestión de Citas</h2>
+    <a href="index.html">🏠 Volver al panel</a>
+</header>
+
+<main>
+    <section>
+        <h3>Registrar Cita</h3>
+        <form id="formCita">
+            <label>Fecha y Hora:
+                <input type="datetime-local" name="fecha_hora" required>
+            </label>
+            <label>Motivo:
+                <input type="text" name="motivo" required>
+            </label>
+            <label>ID Médico:
+                <input type="text" name="id_medico" required>
+            </label>
+            <label>ID Paciente:
+                <input type="text" name="id_paciente" required>
+            </label>
+            <label>Estado:
+                <select name="estado">
+                    <option value="Programada">Programada</option>
+                    <option value="Atendida">Atendida</option>
+                    <option value="Cancelada">Cancelada</option>
+                </select>
+            </label>
+            <button type="submit">Agendar</button>
+        </form>
+    </section>
+
+    <section>
+        <h3>Listado de Citas</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Estado</th>
+                <th>Fecha y Hora</th>
+                <th>Motivo</th>
+                <th>ID Médico</th>
+                <th>ID Paciente</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="tablaCitas"></tbody>
+        </table>
+    </section>
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("formCita");
+        const tabla = document.getElementById("tablaCitas");
+
+        // Datos de ejemplo
+        const citas = [
+            {
+                id: 1,
+                estado: "Programada",
+                fecha_hora: "2025-10-20T09:30",
+                motivo: "Chequeo general",
+                id_medico: "M001",
+                id_paciente: "P001"
+            },
+            {
+                id: 2,
+                estado: "Atendida",
+                fecha_hora: "2025-10-13T14:00",
+                motivo: "Dolor de cabeza",
+                id_medico: "M002",
+                id_paciente: "P002"
+            },
+            {
+                id: 3,
+                estado: "Cancelada",
+                fecha_hora: "2025-10-18T11:00",
+                motivo: "Control de presión arterial",
+                id_medico: "M001",
+                id_paciente: "P003"
+            }
+        ];
+
+        const renderCitas = () => {
+            tabla.innerHTML = "";
+            citas.forEach(cita => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `
+                <td>${cita.id}</td>
+                <td>${cita.estado}</td>
+                <td>${new Date(cita.fecha_hora).toLocaleString()}</td>
+                <td>${cita.motivo}</td>
+                <td>${cita.id_medico}</td>
+                <td>${cita.id_paciente}</td>
+                <td>
+                    <button class="editar">✏️</button>
+                    <button class="eliminar">🗑️</button>
+                </td>
+            `;
+                tabla.appendChild(fila);
+            });
+        };
+
+        renderCitas();
+
+        form.addEventListener("submit", e => {
+            e.preventDefault();
+            const datos = Object.fromEntries(new FormData(form).entries());
+            datos.id = citas.length + 1; // Generar ID automático
+            citas.push(datos);
+            renderCitas();
+            form.reset();
+        });
+
+        // Delegación de eventos para eliminar
+        tabla.addEventListener("click", e => {
+            if (e.target.classList.contains("eliminar")) {
+                const fila = e.target.closest("tr");
+                const id = parseInt(fila.children[0].textContent);
+                const index = citas.findIndex(c => c.id === id);
+                if (index !== -1) citas.splice(index, 1);
+                renderCitas();
+            }
+        });
+    });
+</script>
+</body>
+</html>

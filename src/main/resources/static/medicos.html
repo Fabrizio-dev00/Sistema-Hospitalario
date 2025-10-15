@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Médicos</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        #notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            display: none;
+            z-index: 1000;
+            font-weight: bold;
+        }
+        .success { background-color: #4CAF50; }
+        .error { background-color: #F44336; }
+        button {
+            margin: 2px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="notification"></div>
+<header>
+    <h2>Gestión de Médicos</h2>
+    <a href="index.html">🏠 Volver al panel</a>
+</header>
+
+<main>
+    <section>
+        <h3>Registro / Edición de Médico</h3>
+        <form id="formMedico">
+            <input type="hidden" name="idMedico" id="idMedico">
+            <label>DNI: <input type="text" name="dni" required></label>
+            <label>Nombre: <input type="text" name="nombres" required></label>
+            <label>Apellidos: <input type="text" name="apellidos" required></label>
+            <label>Especialidad: <input type="text" name="especialidad" required></label>
+            <label>Teléfono: <input type="text" name="telefono" required></label>
+            <label>Correo: <input type="email" name="correo" required></label>
+            <button type="submit" id="btnGuardar">Guardar</button>
+            <button type="button" id="btnCancelar" style="display:none;">Cancelar</button>
+        </form>
+    </section>
+
+    <section>
+        <h3>Listado de Médicos</h3>
+        <div id="mensajeCarga" style="text-align: center; padding: 20px;">Cargando médicos...</div>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>DNI</th>
+                <th>Nombre</th>
+                <th>Apellidos</th>
+                <th>Especialidad</th>
+                <th>Teléfono</th>
+                <th>Correo</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="tablaMedicos"></tbody>
+        </table>
+    </section>
+</main>
+
+<script>
+    const API_URL = "/api/medicos";
+    const tablaBody = document.getElementById('tablaMedicos');
+    const mensajeCarga = document.getElementById('mensajeCarga');
+    const formMedico = document.getElementById('formMedico');
+    const notification = document.getElementById('notification');
+    const btnGuardar = document.getElementById('btnGuardar');
+    const btnCancelar = document.getElementById('btnCancelar');
+    let modoEdicion = false;
+
+    // === Función para notificaciones ===
+    function showNotification(message, isSuccess = true) {
+        notification.textContent = message;
+        notification.className = isSuccess ? 'success' : 'error';
+        notification.style.display = 'block';
+        setTimeout(() => { notification.style.display = 'none'; }, 3000);
+    }
+
+    // === Cargar médicos (GET) ===
+    async function cargarMedicos() {
+        mensajeCarga.style.display = 'block';
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error("Error al obtener médicos");
+            const medicos = await response.json();
+            renderizarTabla(medicos);
+        } catch (e) {
+            mensajeCarga.textContent = "Error al cargar médicos.";
+        } finally {
+            mensajeCarga.style.display = 'none';
+        }
+    }
+
+    // === Renderizar tabla ===
+    function renderizarTabla(medicos) {
+        tablaBody.innerHTML = '';
+        if (medicos.length === 0) {
+            tablaBody.innerHTML = '<tr><td colspan="8" style="text-align:center;">No hay médicos registrados.</td></tr>';
+            return;
+        }
+
+        medicos.forEach(medico => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>${medico.idMedico}</td>
+                <td>${medico.dni}</td>
+                <td>${medico.nombres}</td>
+                <td>${medico.apellidos}</td>
+                <td>${medico.especialidad}</td>
+                <td>${medico.telefono}</td>
+                <td>${medico.correo}</td>
+                <td>
+                    <button onclick="editarMedico(${medico.idMedico})">✏️ Editar</button>
+                    <button onclick="desactivarMedico(${medico.idMedico})">🚫 Desactivar</button>
+                </td>
+            `;
+            tablaBody.appendChild(fila);
+        });
+    }
+
+    // === Registrar o actualizar médico ===
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+        const formData = new FormData(formMedico);
+        const medico = {};
+        for (const [key, value] of formData.entries()) medico[key] = value;
+
+        try {
+            let response;
+            if (modoEdicion) {
+                response = await fetch(`${API_URL}/${medico.idMedico}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(medico)
+                });
+            } else {
+                response = await fetch(API_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(medico)
+                });
+            }
+
+            if (response.ok) {
+                showNotification(modoEdicion ? "Médico actualizado correctamente." : "Médico registrado con éxito.");
+                formMedico.reset();
+                btnCancelar.style.display = "none";
+                modoEdicion = false;
+                cargarMedicos();
+            } else {
+                showNotification("Error al guardar los datos.", false);
+            }
+        } catch (error) {
+            showNotification("Error de conexión con el servidor.", false);
+        }
+    }
+
+    // === Editar médico ===
+    async function editarMedico(id) {
+        try {
+            const response = await fetch(`${API_URL}/${id}`);
+            if (!response.ok) throw new Error("No encontrado");
+            const medico = await response.json();
+
+            // Rellenar el formulario
+            for (const key in medico) {
+                if (formMedico[key]) formMedico[key].value = medico[key];
+            }
+
+            modoEdicion = true;
+            btnGuardar.textContent = "Actualizar";
+            btnCancelar.style.display = "inline-block";
+        } catch (error) {
+            showNotification("Error al cargar datos del médico.", false);
+        }
+    }
+
+    // === Desactivar médico ===
+    async function desactivarMedico(id) {
+        if (!confirm("¿Seguro que deseas desactivar este médico?")) return;
+
+        try {
+            const response = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+            if (response.status === 204) {
+                showNotification("Médico desactivado con éxito.");
+                cargarMedicos();
+            } else {
+                showNotification("Error al desactivar médico.", false);
+            }
+        } catch (error) {
+            showNotification("Error de conexión al intentar desactivar.", false);
+        }
+    }
+
+    // === Cancelar edición ===
+    btnCancelar.addEventListener("click", () => {
+        formMedico.reset();
+        modoEdicion = false;
+        btnGuardar.textContent = "Guardar";
+        btnCancelar.style.display = "none";
+    });
+
+    document.addEventListener("DOMContentLoaded", cargarMedicos);
+    formMedico.addEventListener("submit", handleFormSubmit);
+</script>
+</body>
+</html>

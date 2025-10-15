@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header>
+    <h2>📊 Reportes del Sistema Hospitalario</h2>
+    <a href="index.html">🏠 Volver al panel</a>
+</header>
+
+<main>
+    <section>
+        <h3>Reportes Disponibles</h3>
+        <ul class="lista-reportes">
+            <li><button onclick="generarReporte('medicos')">👨‍⚕️ Médicos Registrados</button></li>
+            <li><button onclick="generarReporte('citas')">📅 Citas por Médico</button></li>
+            <li><button onclick="generarReporte('pacientes')">🧍 Pacientes Atendidos</button></li>
+            <li><button onclick="generarReporte('historias')">📖 Historias Clínicas Abiertas</button></li>
+        </ul>
+    </section>
+
+    <section id="resultadoReporte">
+        <h3>Resultado del Reporte</h3>
+        <div id="contenidoReporte" class="tabla-reporte">
+            <p>Selecciona un tipo de reporte para visualizar los datos.</p>
+        </div>
+    </section>
+</main>
+
+<script>
+    // === DATOS DE PRUEBA ===
+    const data = {
+        medicos: [
+            { id: 1, nombres: "Carlos Pérez", especialidad: "Cardiología", telefono: "987654321" },
+            { id: 2, nombres: "Laura Gutiérrez", especialidad: "Pediatría", telefono: "945612378" },
+            { id: 3, nombres: "Miguel Torres", especialidad: "Neurología", telefono: "912345678" }
+        ],
+        citas: [
+            { medico: "Carlos Pérez", cantidad: 15 },
+            { medico: "Laura Gutiérrez", cantidad: 22 },
+            { medico: "Miguel Torres", cantidad: 9 }
+        ],
+        pacientes: [
+            { id: 101, nombre: "María López", dni: "45678912", telefono: "987111222" },
+            { id: 102, nombre: "Juan Díaz", dni: "78965412", telefono: "986222333" },
+            { id: 103, nombre: "Rosa Chávez", dni: "12398745", telefono: "999444555" }
+        ],
+        historias: [
+            { id_historia: 1, paciente: "María López", fecha_apertura: "2025-09-01", observaciones: "Tratamiento en curso" },
+            { id_historia: 2, paciente: "Juan Díaz", fecha_apertura: "2025-08-25", observaciones: "Control post-operatorio" }
+        ]
+    };
+
+    // === FUNCIÓN PRINCIPAL DE REPORTES ===
+    function generarReporte(tipo) {
+        const contenedor = document.getElementById('contenidoReporte');
+        let html = "";
+
+        switch (tipo) {
+            case 'medicos':
+                html = `
+                    <h4>👨‍⚕️ Médicos Registrados</h4>
+                    <table>
+                        <thead>
+                            <tr><th>ID</th><th>Nombre</th><th>Especialidad</th><th>Teléfono</th></tr>
+                        </thead>
+                        <tbody>
+                            ${data.medicos.map(m => `
+                                <tr>
+                                    <td>${m.id}</td>
+                                    <td>${m.nombres}</td>
+                                    <td>${m.especialidad}</td>
+                                    <td>${m.telefono}</td>
+                                </tr>`).join("")}
+                        </tbody>
+                    </table>`;
+                break;
+
+            case 'citas':
+                html = `
+                    <h4>📅 Citas por Médico</h4>
+                    <table>
+                        <thead><tr><th>Médico</th><th>Cantidad de Citas</th></tr></thead>
+                        <tbody>
+                            ${data.citas.map(c => `
+                                <tr>
+                                    <td>${c.medico}</td>
+                                    <td>${c.cantidad}</td>
+                                </tr>`).join("")}
+                        </tbody>
+                    </table>`;
+                break;
+
+            case 'pacientes':
+                html = `
+                    <h4>🧍 Pacientes Atendidos</h4>
+                    <table>
+                        <thead><tr><th>ID</th><th>Nombre</th><th>DNI</th><th>Teléfono</th></tr></thead>
+                        <tbody>
+                            ${data.pacientes.map(p => `
+                                <tr>
+                                    <td>${p.id}</td>
+                                    <td>${p.nombre}</td>
+                                    <td>${p.dni}</td>
+                                    <td>${p.telefono}</td>
+                                </tr>`).join("")}
+                        </tbody>
+                    </table>`;
+                break;
+
+            case 'historias':
+                html = `
+                    <h4>📖 Historias Clínicas Abiertas</h4>
+                    <table>
+                        <thead><tr><th>ID Historia</th><th>Paciente</th><th>Fecha Apertura</th><th>Observaciones</th></tr></thead>
+                        <tbody>
+                            ${data.historias.map(h => `
+                                <tr>
+                                    <td>${h.id_historia}</td>
+                                    <td>${h.paciente}</td>
+                                    <td>${h.fecha_apertura}</td>
+                                    <td>${h.observaciones}</td>
+                                </tr>`).join("")}
+                        </tbody>
+                    </table>`;
+                break;
+
+            default:
+                html = `<p>No se reconoce el tipo de reporte.</p>`;
+        }
+
+        contenedor.innerHTML = html;
+    }
+</script>
+</body>
+</html>

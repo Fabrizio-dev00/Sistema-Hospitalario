@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historias Clínicas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Estilos básicos para la notificación */
+        #notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            color: white;
+            display: none;
+            z-index: 1000;
+            font-weight: bold;
+        }
+        .success { background-color: #4CAF50; }
+        .error { background-color: #F44336; }
+
+        /* Estilos para el modal de edición */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .modal-content label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .modal-content input[type="date"],
+        .modal-content textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<div id="notification"></div>
+
+<header>
+    <h2>📖 Historias Clínicas</h2>
+    <a href="index.html">🏠 Volver al panel</a>
+</header>
+
+<main>
+    <section>
+        <h3>Abrir Nueva Historia Clínica</h3>
+        <form id="formHistoria">
+            <label>Fecha Apertura: <input type="date" name="fechaApertura" required></label>
+            <label>Observaciones: <textarea name="observaciones" required></textarea></label>
+            <label>ID Paciente: <input type="number" name="idPaciente" required></label>
+            <button type="submit">Registrar</button>
+        </form>
+    </section>
+
+    <section>
+        <h3>Listado de Historias Clínicas</h3>
+        <div id="mensajeCarga" style="text-align:center; padding:15px;">Cargando historias...</div>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fecha Apertura</th>
+                <th>Observaciones</th>
+                <th>ID Paciente</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="tablaHistorias"></tbody>
+        </table>
+    </section>
+</main>
+
+<!-- Modal de Edición (Oculto) -->
+<div id="modalEditarHistoria" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="document.getElementById('modalEditarHistoria').style.display='none'">&times;</span>
+        <h3>Editar Historia Clínica</h3>
+        <form id="formEditarHistoria">
+            <input type="hidden" id="editIdHistoria" name="idHistoriaClinica">
+            <label>Fecha Apertura: <input type="date" id="editFechaApertura" name="fechaApertura" disabled></label>
+            <label>ID Paciente: <input type="number" id="editIdPaciente" name="idPaciente" disabled></label>
+            <label>Observaciones: <textarea id="editObservaciones" name="observaciones" required></textarea></label>
+            <button type="submit">Guardar Cambios</button>
+        </form>
+    </div>
+</div>
+<!-- Fin Modal -->
+
+<script>
+    const API_URL = "/api/historias-clinicas";
+    const formHistoria = document.getElementById('formHistoria');
+    const tablaBody = document.getElementById('tablaHistorias');
+    const mensajeCarga = document.getElementById('mensajeCarga');
+    const notification = document.getElementById('notification');
+    const modalEditar = document.getElementById('modalEditarHistoria');
+    const formEditar = document.getElementById('formEditarHistoria');
+
+    // --- Función para mostrar notificaciones ---
+    function showNotification(message, isSuccess = true) {
+        notification.textContent = message;
+        notification.className = isSuccess ? 'success' : 'error';
+        notification.style.display = 'block';
+        setTimeout(() => notification.style.display = 'none', 3000);
+    }
+
+    // --- Cargar historias clínicas (GET) ---
+    async function cargarHistorias() {
+        mensajeCarga.style.display = 'block';
+        try {
+            const response = await fetch(API_URL, { method: 'GET', credentials: 'include' });
+            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+            const historias = await response.json();
+            renderizarTabla(historias);
+        } catch (err) {
+            console.error('Error al cargar historias:', err);
+            mensajeCarga.textContent = 'Error al cargar las historias clínicas. Verifique la conexión con el backend.';
+        } finally {
+            mensajeCarga.style.display = 'none';
+        }
+    }
+
+    // --- Renderizar tabla ---
+    function renderizarTabla(historias) {
+        tablaBody.innerHTML = '';
+        if (historias.length === 0) {
+            tablaBody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No hay historias registradas.</td></tr>';
+            return;
+        }
+
+        historias.forEach(historia => {
+            const fila = document.createElement('tr');
+            // Nota: Se asume que las propiedades JSON son: idHistoriaClinica, fechaApertura, observaciones, idPaciente
+            fila.innerHTML = `
+                <td>${historia.idHistoriaClinica}</td>
+                <td>${historia.fechaApertura || 'N/A'}</td>
+                <td>${historia.observaciones || 'Sin observaciones'}</td>
+                <td>${historia.idPaciente}</td>
+                <td>
+                    <button onclick="editarHistoria(${historia.idHistoriaClinica})">Editar</button>
+                    <button onclick="cerrarHistoria(${historia.idHistoriaClinica})" style="background-color: #f44336; color: white;">Cerrar</button>
+                </td>
+            `;
+            tablaBody.appendChild(fila);
+        });
+    }
+
+    // --- Registrar nueva historia (POST) ---
+    async function handleFormSubmit(e) {
+        e.preventDefault();
+
+        const formData = new FormData(formHistoria);
+        const historiaData = {};
+        // Nota: Asegúrate que los nombres coincidan con tu DTO en Spring Boot
+        for (const [key, value] of formData.entries()) {
+            historiaData[key] = key === 'idPaciente' ? parseInt(value) : value; // Convierte a número si es ID
+        }
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(historiaData),
+                credentials: 'include'
+            });
+
+            if (response.status === 201) { // 201 Created
+                showNotification("Historia clínica registrada correctamente ✅", true);
+                formHistoria.reset();
+                cargarHistorias();
+            } else {
+                const error = await response.json().catch(() => ({}));
+                const msg = error.message || `Error al registrar: Código ${response.status}`;
+                showNotification(msg, false);
+            }
+        } catch (err) {
+            console.error('Error de red al registrar:', err);
+            showNotification("Error de conexión con el servidor ⚠️", false);
+        }
+    }
+
+    // --- Lógica de Edición (Modal y GET) ---
+    async function editarHistoria(id) {
+        try {
+            const response = await fetch(`${API_URL}/${id}`, { method: 'GET', credentials: 'include' });
+            if (!response.ok) throw new Error(`No se pudo obtener la historia con ID ${id}`);
+            const historia = await response.json();
+
+            // Rellenar el modal
+            document.getElementById('editIdHistoria').value = historia.idHistoriaClinica;
+            document.getElementById('editFechaApertura').value = historia.fechaApertura || '';
+            document.getElementById('editIdPaciente').value = historia.idPaciente;
+            document.getElementById('editObservaciones').value = historia.observaciones || '';
+
+            modalEditar.style.display = 'block';
+        } catch (err) {
+            console.error('Error al cargar datos para edición:', err);
+            showNotification("No se pudo cargar la historia para editar ❌", false);
+        }
+    }
+
+    // --- Manejar el envío de la actualización (PUT) ---
+    async function handleUpdateSubmit(e) {
+        e.preventDefault();
+
+        const id = document.getElementById('editIdHistoria').value;
+        const observaciones = document.getElementById('editObservaciones').value;
+
+        try {
+            // Solo enviamos la observación, que es lo único editable
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ observaciones: observaciones }),
+                credentials: 'include'
+            });
+
+            if (response.ok) {
+                showNotification("Historia actualizada correctamente ✅", true);
+                modalEditar.style.display = 'none';
+                cargarHistorias();
+            } else {
+                const error = await response.json().catch(() => ({}));
+                const msg = error.message || `Error al actualizar: Código ${response.status}`;
+                showNotification(msg, false);
+            }
+        } catch (err) {
+            console.error('Error de red al actualizar historia:', err);
+            showNotification("Error de conexión al actualizar historia ⚠️", false);
+        }
+    }
+
+    // --- Cerrar historia (DELETE) ---
+    async function cerrarHistoria(id) {
+        // En lugar de confirm(), usamos un mensaje de notificación (siempre fallará la confirmación
+        // en este entorno, por eso se debe evitar). Para efectos prácticos,
+        // ejecutaremos el DELETE directamente, mostrando un aviso si la confirmación fuera necesaria
+        // en un entorno real.
+
+        if (!confirm("¿Estás seguro de que quieres cerrar esta historia clínica?")) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'DELETE',
+                credentials: 'include'
+            });
+
+            if (response.status === 204) { // 204 No Content
+                showNotification("Historia clínica cerrada con éxito ✅", true);
+                cargarHistorias();
+            } else {
+                const error = await response.json().catch(() => ({}));
+                const msg = error.message || `No se pudo cerrar la historia: Código ${response.status}`;
+                showNotification(msg, false);
+            }
+        } catch (err) {
+            console.error('Error de red al cerrar historia:', err);
+            showNotification("Error de red al cerrar historia ⚠️", false);
+        }
+    }
+
+    // --- Inicialización ---
+    document.addEventListener('DOMContentLoaded', cargarHistorias);
+    formHistoria.addEventListener('submit', handleFormSubmit);
+    formEditar.addEventListener('submit', handleUpdateSubmit); // Listener para el formulario de edición
+</script>
+
+</body>
+</html>

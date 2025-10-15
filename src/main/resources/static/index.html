@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hospital System - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-blue-50 to-teal-100 min-h-screen flex items-center justify-center px-4">
+
+<!-- CONTENEDOR PRINCIPAL -->
+<div id="app-container" class="w-full">
+
+    <!-- LOGIN -->
+    <div id="login-view" class="max-w-md mx-auto bg-white shadow-2xl rounded-2xl p-8 fade-in">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-3xl font-bold">🏥</div>
+            <h1 class="text-3xl font-extrabold text-blue-700">Hospital System</h1>
+            <p class="text-gray-500 mt-2">Accede con tus credenciales institucionales</p>
+        </div>
+
+        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-6">
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-700">Usuario</label>
+                <input type="text" id="username" name="username" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
+                <input type="password" id="password" name="password" required
+                       class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            <div id="error-message" class="text-sm text-red-600 font-semibold hidden p-2 bg-red-50 border border-red-300 rounded-md"></div>
+
+            <button type="submit" id="login-button"
+                    class="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all">
+                Iniciar Sesión
+            </button>
+        </form>
+
+        <p class="text-center text-xs text-gray-400 mt-6">
+            © 2025 Hospital Central. Todos los derechos reservados.
+        </p>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="dashboard-view" class="hidden p-8 fade-in">
+        <header class="flex justify-between items-center bg-white shadow-md rounded-xl p-4 mb-8 border border-gray-200">
+            <h2 class="text-2xl font-bold text-blue-700 flex items-center gap-2">
+                <span>📋</span> Panel de Gestión
+            </h2>
+            <div class="flex items-center space-x-4">
+                <span id="user-info" class="text-blue-600 font-medium"></span>
+                <button id="logout-button" onclick="handleLogout()"
+                        class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition">
+                    Cerrar Sesión
+                </button>
+            </div>
+        </header>
+
+        <main class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- BIENVENIDA -->
+            <div class="md:col-span-3 bg-white p-6 rounded-xl shadow-sm border-l-4 border-blue-500">
+                <h3 class="text-xl font-semibold text-gray-700">Bienvenido(a) al Sistema Hospitalario</h3>
+                <p class="text-gray-500 mt-2">Selecciona un módulo según tus permisos.</p>
+            </div>
+
+            <!-- MÓDULOS -->
+            <div id="modulo-usuarios" class="modulo hidden bg-white p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer border-t-4 border-blue-600">
+                <h4 class="text-lg font-bold text-gray-800">👤 Gestión de Usuarios</h4>
+                <p class="text-sm text-gray-500 mt-1">Crear, editar y administrar accesos.</p>
+            </div>
+
+            <div id="modulo-medicos" class="modulo hidden bg-white p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer border-t-4 border-teal-500">
+                <h4 class="text-lg font-bold text-gray-800">🩺 Gestión de Médicos</h4>
+                <p class="text-sm text-gray-500 mt-1">Administrar datos del personal médico.</p>
+            </div>
+
+            <div id="modulo-citas" class="modulo hidden bg-white p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer border-t-4 border-green-500">
+                <h4 class="text-lg font-bold text-gray-800">📅 Gestión de Citas</h4>
+                <p class="text-sm text-gray-500 mt-1">Agendar y modificar citas médicas.</p>
+            </div>
+
+            <div id="modulo-pacientes" class="modulo hidden bg-white p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer border-t-4 border-indigo-500">
+                <h4 class="text-lg font-bold text-gray-800">🧍 Gestión de Pacientes</h4>
+                <p class="text-sm text-gray-500 mt-1">Registrar y actualizar información de pacientes.</p>
+            </div>
+
+            <div id="modulo-historias" class="modulo hidden bg-white p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer border-t-4 border-purple-500">
+                <h4 class="text-lg font-bold text-gray-800">📖 Historias Clínicas</h4>
+                <p class="text-sm text-gray-500 mt-1">Consultar y gestionar expedientes médicos.</p>
+            </div>
+
+            <div id="modulo-reporte" class="modulo hidden bg-white p-6 rounded-xl shadow hover:shadow-lg transition cursor-pointer border-t-4 border-yellow-500">
+                <h4 class="text-lg font-bold text-gray-800">📊 Reportes</h4>
+                <p class="text-sm text-gray-500 mt-1">Ver reportes y estadísticas médicas.</p>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    const roleModuleMap = {
+        'ADMIN': ['modulo-usuarios', 'modulo-medicos', 'modulo-citas', 'modulo-pacientes', 'modulo-historias', 'modulo-reporte'],
+        'ASISTENTE': ['modulo-medicos', 'modulo-citas', 'modulo-pacientes', 'modulo-historias', 'modulo-reporte'],
+        'MEDICO': ['modulo-historias', 'modulo-reporte']
+    };
+
+    const loginView = document.getElementById('login-view');
+    const dashboardView = document.getElementById('dashboard-view');
+    const userInfo = document.getElementById('user-info');
+    const errorMessage = document.getElementById('error-message');
+    const loginButton = document.getElementById('login-button');
+
+    async function handleLogin(event) {
+        event.preventDefault();
+        errorMessage.classList.add('hidden');
+        loginButton.disabled = true;
+        loginButton.textContent = 'Iniciando...';
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const username = formData.get('username');
+        const password = formData.get('password');
+
+        try {
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `username=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}`
+            });
+
+            if (response.ok) {
+                await checkAuthentication();
+            } else {
+                showError('Usuario o contraseña incorrectos.');
+            }
+        } catch {
+            showError('No se pudo conectar con el servidor.');
+        } finally {
+            loginButton.disabled = false;
+            loginButton.textContent = 'Iniciar Sesión';
+        }
+    }
+
+    async function checkAuthentication() {
+        try {
+            const response = await fetch('/api/usuarios/current-user-roles');
+            if (response.ok) {
+                const data = await response.json();
+                if (data?.username && data?.roles?.length > 0) {
+                    renderDashboard(data.username, data.roles);
+                    loginView.classList.add('hidden');
+                    dashboardView.classList.remove('hidden');
+                } else {
+                    showError('Usuario autenticado, pero sin roles asignados.');
+                }
+            } else renderLogin();
+        } catch {
+            renderLogin();
+        }
+    }
+
+    function renderDashboard(username, roles) {
+        userInfo.textContent = `👤 ${username} | Rol(es): ${roles.join(', ')}`;
+        document.querySelectorAll('.modulo').forEach(m => m.classList.add('hidden'));
+        roles.forEach(role => roleModuleMap[role]?.forEach(id => document.getElementById(id)?.classList.remove('hidden')));
+    }
+
+    function renderLogin() {
+        loginView.classList.remove('hidden');
+        dashboardView.classList.add('hidden');
+        document.getElementById('login-form').reset();
+    }
+
+    function showError(message) {
+        errorMessage.textContent = message;
+        errorMessage.classList.remove('hidden');
+    }
+
+    async function handleLogout() {
+        await fetch('/logout', { method: 'POST' });
+        renderLogin();
+        alert('Sesión cerrada correctamente.');
+    }
+
+    window.onload = checkAuthentication;
+    // === NAVEGACIÓN A LOS MÓDULOS ===
+    document.querySelectorAll('.modulo').forEach(modulo => {
+        modulo.addEventListener('click', () => {
+            const id = modulo.id;
+
+            switch (id) {
+                case 'modulo-medicos':
+                    window.location.href = '/medicos.html';
+                    break;
+                case 'modulo-citas':
+                    window.location.href = '/citas.html';
+                    break;
+                case 'modulo-pacientes':
+                    window.location.href = '/pacientes.html';
+                    break;
+                case 'modulo-historias':
+                    window.location.href = '/historias.html';
+                    break;
+                case 'modulo-reporte':
+                    window.location.href = '/reportes.html';
+                    break;
+                case 'modulo-usuarios':
+                    window.location.href = '/usuarios.html';
+                    break;
+                default:
+                    console.warn('Módulo no reconocido:', id);
+            }
+        });
+    });
+
+</script>
+</body>
+</html>
+

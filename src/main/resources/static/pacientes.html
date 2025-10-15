@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Pacientes</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<header>
+    <h2>Gestión de Pacientes</h2>
+    <a href="index.html">🏠 Volver al panel</a>
+</header>
+
+<main>
+    <section>
+        <h3>Registrar Paciente</h3>
+        <form id="formPaciente">
+            <label>ID Paciente:
+                <input type="text" name="id_paciente" required>
+            </label>
+            <label>Nombres:
+                <input type="text" name="nombres" required>
+            </label>
+            <label>Apellidos:
+                <input type="text" name="apellidos" required>
+            </label>
+            <label>DNI:
+                <input type="text" name="dni" maxlength="8" required>
+            </label>
+            <label>Correo:
+                <input type="email" name="correo" required>
+            </label>
+            <label>Teléfono:
+                <input type="text" name="telefono" maxlength="9" required>
+            </label>
+            <label>Dirección:
+                <input type="text" name="direccion">
+            </label>
+            <label>Sexo:
+                <select name="sexo" required>
+                    <option value="">Seleccione...</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                </select>
+            </label>
+            <label>Fecha de Nacimiento:
+                <input type="date" name="fecha_nacimiento" required>
+            </label>
+            <label>Estado:
+                <select name="estado">
+                    <option value="Activo">Activo</option>
+                    <option value="Inactivo">Inactivo</option>
+                </select>
+            </label>
+            <button type="submit">Guardar Paciente</button>
+        </form>
+    </section>
+
+    <section>
+        <h3>Listado de Pacientes</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
+                <th>DNI</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Dirección</th>
+                <th>Sexo</th>
+                <th>Fecha Nacimiento</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody id="tablaPacientes">
+            <!-- Aquí se insertarán dinámicamente las filas -->
+            </tbody>
+        </table>
+    </section>
+</main>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const form = document.getElementById("formPaciente");
+        const tabla = document.getElementById("tablaPacientes");
+
+        const pacientes = [
+            {
+                id_paciente: "P001",
+                nombres: "Juan",
+                apellidos: "Pérez López",
+                dni: "74859632",
+                correo: "juanperez@gmail.com",
+                telefono: "987654321",
+                direccion: "Av. Grau 123",
+                sexo: "M",
+                fecha_nacimiento: "1995-03-12",
+                estado: "Activo"
+            },
+            {
+                id_paciente: "P002",
+                nombres: "María",
+                apellidos: "Gómez Torres",
+                dni: "75963214",
+                correo: "maria.gomez@hotmail.com",
+                telefono: "999888777",
+                direccion: "Jr. San Martín 456",
+                sexo: "F",
+                fecha_nacimiento: "1990-08-25",
+                estado: "Activo"
+            }
+        ];
+
+        const renderPacientes = () => {
+            tabla.innerHTML = "";
+            pacientes.forEach(p => {
+                const fila = document.createElement("tr");
+                fila.innerHTML = `
+                <td>${p.id_paciente}</td>
+                <td>${p.nombres}</td>
+                <td>${p.apellidos}</td>
+                <td>${p.dni}</td>
+                <td>${p.correo}</td>
+                <td>${p.telefono}</td>
+                <td>${p.direccion}</td>
+                <td>${p.sexo}</td>
+                <td>${p.fecha_nacimiento}</td>
+                <td>${p.estado}</td>
+                <td>
+                    <button class="editar">✏️</button>
+                    <button class="eliminar">🗑️</button>
+                </td>
+            `;
+                tabla.appendChild(fila);
+            });
+        };
+
+        renderPacientes();
+
+        form.addEventListener("submit", e => {
+            e.preventDefault();
+            const datos = Object.fromEntries(new FormData(form).entries());
+            pacientes.push(datos);
+            renderPacientes();
+            form.reset();
+        });
+    });
+</script>
+</body>
+</html>
